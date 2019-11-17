@@ -13,7 +13,7 @@ async function main(options) {
   const showInformation = parseVideoInformation(rawData, options);
   console.log(`[ ] Creating Markdown`);
   const markdownText = createMarkdown(showInformation, options);
-  console.log("[ ] Writing to file", options.MARKDOWN_FILENAME);
+  console.log("[ ] Writing to file", options.MARKDOWN_FULLPATH);
   await writeFile(options.MARKDOWN_FULLPATH, markdownText);
   console.log("[ ] Complete");
 }
