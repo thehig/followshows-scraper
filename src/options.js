@@ -28,6 +28,9 @@ const options = {
     VERBOSE_PARSING: false,
   },
   markdown: {
+    FILTER_NEW_SEASON: true,
+    FILTER_ONGOING_SEASON: true,
+    FILTER_NEW_SERIES: true,
     // Does Match: s1e1 s1e01 s9e1 s9e01 s12e1 s12e01
     // Does Not Match: s1e2 s1e10 s9e2 s9e10 s12e2 s12e10
     NEW_SEASON_REGEX: /^s\d*e0?1$/
