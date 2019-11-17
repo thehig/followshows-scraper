@@ -29,6 +29,10 @@ const CSS_SELECTOR_VIDEO_WRAPPER = ".video-wrapper";
 const CSS_SELECTOR_VIDEO_TILE = ".video-tile";
 const CSS_SELECTOR_VIDEO_INFOBAR = ".video-infos";
 
+// Does Match: s1e1 s9e1 s12e1
+// Does Not Match: s1e2 s1e10 s9e2 s9e10 s12e2 s12e10
+const NEW_SEASON_REGEX = /^s\d*e0?1$/;
+
 // Open the browser, scrape the raw data into a JSON object
 async function scrapeVideos() {
   console.log(`[ ]      Opening Browser`);
@@ -177,7 +181,7 @@ async function main() {
   const newSeries = showInformation.filter(show => show.nextEpisode === "s1e1"); // prettier-ignore
   // sNe1 except s1e1
   const newSeason = showInformation.filter(
-    show => show.nextEpisode != "s1e1" && /^s\d*e0?1/.test(show.nextEpisode)
+    show => show.nextEpisode != "s1e1" && NEW_SEASON_REGEX.test(show.nextEpisode)
   );
   //sNeN
   const ongoingSeason = showInformation.filter( show => show.nextEpisode != "s1e1" ); // prettier-ignore
