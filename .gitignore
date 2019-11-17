@@ -1,4 +1,4 @@
 node_modules
 chromedata
-# screenshots/*.*
-# data/*.*
+screenshots/*.*
+data/*.*
