@@ -4,7 +4,7 @@
   "description": "",
   "main": "bin/cli.js",
   "scripts": {
-    "start": "node src/main.js"
+    "start": "node src/index.js"
   },
   "bin": {
     "follow-scrape": "./bin/cli.js"

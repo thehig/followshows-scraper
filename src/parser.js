@@ -1,5 +1,5 @@
 // Turn the scraped data into parsed, usable information
-const parseVideoInformation = (videos, { VERBOSE_PARSING }) => {
+const parseVideoInformation = (videos, { parser: { VERBOSE_PARSING } }) => {
   process.stdout.write(`[ ]      Parsing ${videos.length} videos `);
   const write = VERBOSE_PARSING ? process.stdout.write : (f => f); // prettier-ignore
 

@@ -3,16 +3,18 @@ const path = require("path");
 
 // Open the browser, scrape the raw data into a JSON object
 async function scrapeVideos({
-  CHROME_EXECUTABLE_PATH,
-  CHROME_DATA_DIR,
-  WEB_URL,
-  CSS_SELECTOR_SHOW_ALL,
-  CSS_SELECTOR_VIDEO_GRID,
-  CSS_SELECTOR_VIDEO_WRAPPER,
-  CSS_SELECTOR_VIDEO_TILE,
-  CSS_SELECTOR_VIDEO_INFOBAR,
-  SCREENSHOTS_DATA_DIR,
-  TAKE_SCREENSHOT
+  puppeteer: {
+    CHROME_EXECUTABLE_PATH,
+    CHROME_DATA_DIR,
+    WEB_URL,
+    CSS_SELECTOR_SHOW_ALL,
+    CSS_SELECTOR_VIDEO_GRID,
+    CSS_SELECTOR_VIDEO_WRAPPER,
+    CSS_SELECTOR_VIDEO_TILE,
+    CSS_SELECTOR_VIDEO_INFOBAR,
+    SCREENSHOTS_DATA_DIR,
+    TAKE_SCREENSHOT
+  }
 }) {
   console.log(`[ ]      Opening Browser`);
   const browser = await puppeteer.launch({

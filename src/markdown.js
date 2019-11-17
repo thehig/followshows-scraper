@@ -32,7 +32,10 @@ const createMarkdownTable = (dataArray, name) => {
   return result;
 };
 
-const createMarkdown = (showInformation, { NEW_SEASON_REGEX }) => {
+const createMarkdown = (
+  showInformation,
+  { markdown: { NEW_SEASON_REGEX } }
+) => {
   // New Series have nextEpisode === s1e1
   const newSeries = showInformation.filter(show => show.nextEpisode === "s1e1"); // prettier-ignore
   // New Season have nextEpisode episode === 1
