@@ -20,7 +20,8 @@ const SCREENSHOTS_DATA_DIR = path.resolve(__dirname, "../screenshots");
 // Filename
 let now = new Date();
 const date = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}-${now.getMinutes()}`; // prettier-ignore
-const MARKDOWN_FILENAME = path.join( MARKDOWN_DATA_DIR, `followshows-${date}.md` ); // prettier-ignore
+const MARKDOWN_FILENAME = `followshows-${date}.md`;
+const MARKDOWN_FULLPATH = path.join( MARKDOWN_DATA_DIR, MARKDOWN_FILENAME ); // prettier-ignore
 
 // CSS Selectors
 const CSS_SELECTOR_VIDEO_GRID = ".videos-grid-container";
@@ -45,7 +46,7 @@ async function scrapeVideos() {
 
   const page = await browser.newPage();
 
-  console.log(`[ ]      ${WEB_URL}`);
+  console.log(`[ ]      Navigating to ${WEB_URL}`);
   await page.goto(WEB_URL, {
     waitUntil: "networkidle2",
     timeout: 0
@@ -157,17 +158,28 @@ const parseVideoInformation = videos => {
 };
 
 // Convert a JSON object array into a markdown table (assuming they all have the same keys) and format using prettier
-const createMarkdownTable = dataArray => {
+const createMarkdownTable = (dataArray, name) => {
+  process.stdout.write(`[ ]      "${name}" Table `);
+
   // Use the first item in the array to determine the keys
   const keys = Object.keys(dataArray[0]);
 
-  return [
+  const result = [
+    `# ${name}\n`, // Table Name
     `| ${keys.join(" | ")} |`, // Table Header
     `| ${" :---: |".repeat(keys.length)}`, // Table Alignment Indicators
     dataArray
-      .map(obj => `| ${keys.map(key => obj[key]).join(" | ")} |`) // Table Row
+      .sort((a, b) => a.numEpisodes - b.numEpisodes)
+      .map(obj => {
+        process.stdout.write(".");
+        return `| ${keys.map(key => obj[key]).join(" | ")} |`;
+      }) // Table Row
       .join("\n")
   ].join("\n");
+
+  process.stdout.write("\n");
+
+  return result;
 };
 
 async function main() {
@@ -175,36 +187,32 @@ async function main() {
   const rawData = await scrapeVideos();
   console.log(`[ ] Parsing Video Information`);
   const showInformation = parseVideoInformation(rawData);
-  console.log(`[ ] Creating Markdown`);
 
-  // s1e1
+  // New Series have nextEpisode === s1e1
   const newSeries = showInformation.filter(show => show.nextEpisode === "s1e1"); // prettier-ignore
-  // sNe1 except s1e1
+  // New Season have nextEpisode episode === 1
   const newSeason = showInformation.filter(
-    show => show.nextEpisode != "s1e1" && NEW_SEASON_REGEX.test(show.nextEpisode)
+    show =>
+      show.nextEpisode != "s1e1" && NEW_SEASON_REGEX.test(show.nextEpisode)
   );
-  //sNeN
-  const ongoingSeason = showInformation.filter( show => show.nextEpisode != "s1e1" ); // prettier-ignore
+  // Ongoing Season have nextEpisode !== 1 && !== s1e1
+  const ongoingSeason = showInformation.filter(
+    show =>
+      show.nextEpisode != "s1e1" && !NEW_SEASON_REGEX.test(show.nextEpisode)
+  );
 
+  console.log(`[ ] Creating Markdown`);
   const markdownText = prettier.format(
-    `
-  # Ongoing Season
-  
-  ${createMarkdownTable(ongoingSeason)}
-  
-  # New Season
-  
-  ${createMarkdownTable(newSeason)}
-
-  # New Series
-  
-  ${createMarkdownTable(newSeries)}
-  `,
+    [
+      createMarkdownTable(ongoingSeason, "Ongoing Season"),
+      createMarkdownTable(newSeason, "New Season"),
+      createMarkdownTable(newSeries, "New Series")
+    ].join("\n\n"),
     { parser: "markdown" }
   );
 
   console.log("[ ] Writing to file", MARKDOWN_FILENAME);
-  await writeFile(MARKDOWN_FILENAME, markdownText);
+  await writeFile(MARKDOWN_FULLPATH, markdownText);
   console.log("[ ] Complete");
 }
 
