@@ -34,7 +34,7 @@ async function scrapeVideos() {
   console.log(`[ ]      Opening Browser`);
   const browser = await puppeteer.launch({
     devtools: true,
-    headless: false,
+    headless: true,
     executablePath: CHROME_EXECUTABLE_PATH,
     userDataDir: CHROME_DATA_DIR
   });
