@@ -52,6 +52,8 @@ async function scrapeVideos() {
     timeout: 0
   });
 
+  await page.bringToFront();
+
   console.log(`[ ]      Clicking ${CSS_SELECTOR_SHOW_ALL}`);
   await page.click(CSS_SELECTOR_SHOW_ALL);
 
@@ -89,7 +91,7 @@ async function scrapeVideos() {
 
 // Turn the scraped data into parsed, usable information
 const parseVideoInformation = videos => {
-  process.stdout.write(`[ ]      Got ${videos.length} videos `);
+  process.stdout.write(`[ ]      Parsing ${videos.length} videos `);
   const write = VERBOSE_PARSING ? process.stdout.write : f => f;
 
   const result = videos.map(([tileText, infoText]) => {
@@ -157,6 +159,13 @@ const parseVideoInformation = videos => {
   return result;
 };
 
+const toTitleCase = input =>
+  input
+    // insert a space before all caps
+    .replace(/([A-Z])/g, " $1")
+    // uppercase the first character
+    .replace(/^./, str => str.toUpperCase());
+
 // Convert a JSON object array into a markdown table (assuming they all have the same keys) and format using prettier
 const createMarkdownTable = (dataArray, name) => {
   process.stdout.write(`[ ]      "${name}" Table `);
@@ -166,7 +175,7 @@ const createMarkdownTable = (dataArray, name) => {
 
   const result = [
     `# ${name}\n`, // Table Name
-    `| ${keys.join(" | ")} |`, // Table Header
+    `| ${keys.map(toTitleCase).join(" | ")} |`, // Table Header
     `| ${" :---: |".repeat(keys.length)}`, // Table Alignment Indicators
     dataArray
       .sort((a, b) => a.numEpisodes - b.numEpisodes)
