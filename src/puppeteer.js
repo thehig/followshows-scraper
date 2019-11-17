@@ -16,6 +16,7 @@ async function scrapeVideos({
     TAKE_SCREENSHOT
   }
 }) {
+  console.log(`[ ] Puppeteer`);
   console.log(`[ ]      Opening Browser`);
   const browser = await puppeteer.launch({
     devtools: true,

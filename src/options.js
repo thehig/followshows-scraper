@@ -33,6 +33,7 @@ const options = {
     NEW_SEASON_REGEX: /^s\d*e0?1$/
   },
   file: {
+    WRITE_TO_FILE: false,
     MARKDOWN_DATA_DIR,
     MARKDOWN_FILENAME,
     MARKDOWN_FULLPATH: path.join( MARKDOWN_DATA_DIR, MARKDOWN_FILENAME ) // prettier-ignore

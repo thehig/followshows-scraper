@@ -36,6 +36,7 @@ const createMarkdown = (
   showInformation,
   { markdown: { NEW_SEASON_REGEX } }
 ) => {
+  console.log(`[ ] Markdown`);
   // New Series have nextEpisode === s1e1
   const newSeries = showInformation.filter(show => show.nextEpisode === "s1e1"); // prettier-ignore
   // New Season have nextEpisode episode === 1
