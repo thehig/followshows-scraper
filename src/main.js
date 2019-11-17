@@ -92,7 +92,7 @@ async function scrapeVideos() {
 // Turn the scraped data into parsed, usable information
 const parseVideoInformation = videos => {
   process.stdout.write(`[ ]      Parsing ${videos.length} videos `);
-  const write = VERBOSE_PARSING ? process.stdout.write : f => f;
+  const write = VERBOSE_PARSING ? process.stdout.write : (f => f); // prettier-ignore
 
   const result = videos.map(([tileText, infoText]) => {
     if (!VERBOSE_PARSING) process.stdout.write(".");
