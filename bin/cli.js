@@ -1,21 +1,11 @@
 #!/usr/bin/env node
-
-const options = require('../src/options.js');
-const main = require('../src/main.js');
-
-main(options);
-
-// const groups = {
-//   // Puppeteer Options
-//   // Output Options
-// };
-
-
-// const usage = `Usage String goes Here`;
+const yargs = require("yargs");
+const defaults = require("../src/defaults.js");
+const main = require("../src/main.js");
 
 /**
  * https://github.com/yargs/yargs/blob/aa09faf708457bf46eb9b003ce168302763a7d9e/docs/api.md
- * 
+ *
  * alias: string or array of strings, alias(es) for the canonical option key, see alias()
  * array: boolean, interpret option as an array, see array()
  * boolean: boolean, interpret option as a boolean flag, see boolean()
@@ -47,10 +37,186 @@ main(options);
  *        'string': synonymous for string: true, see string()
  */
 
-// prettier-ignore
-// const options = 
-//         yargs.usage(usage)
-//         .option("verbose", { alias: "v", describe: "Enable verbose logging", type: "boolean", default: false })
-//         .argv;
+const args = yargs
+  .wrap(Math.min(180, yargs.terminalWidth()))
 
-// console.log(`Options: ${JSON.stringify(options)}`);
+  .usage("Usage: $0 [options]")
+  .example(
+    "$0 -nNoc",
+    "show new season (n), ongoing season (o) and new Series (N) in the console (c)"
+  )
+  .epilogue(
+    "For more information check the github repository at https://github.com/thehig/followshows-scraper"
+  )
+  .alias("v", "version")
+  // Generic Options
+  .option("help", {
+    alias: "h",
+    describe: "Show this document",
+    type: "boolean"
+  })
+  .option("show-hidden", {
+    alias: "H",
+    describe: "Show hidden options",
+    type: "boolean"
+  })
+  .option("PRINT_CONFIG", {
+    alias: "PC",
+    describe: "Show configuration without starting",
+    type: "boolean",
+    default: false
+  })
+  // Puppeteer Options
+  .option("TAKE_SCREENSHOT", {
+    alias: "s",
+    group: "Puppeteer",
+    describe: "Take a screenshot of the video grid",
+    type: "boolean",
+    default: defaults.puppeteer.TAKE_SCREENSHOT
+  })
+  .option("CHROME_EXECUTABLE_PATH", {
+    group: "Puppeteer",
+    describe: "Location of chrome executable",
+    type: "string",
+    hidden: true,
+    default: defaults.puppeteer.CHROME_EXECUTABLE_PATH
+  })
+  .option("CHROME_DATA_DIR", {
+    group: "Puppeteer",
+    describe: "Location of chrome data directory",
+    type: "string",
+    hidden: true,
+    default: defaults.puppeteer.CHROME_DATA_DIR
+  })
+  .option("SCREENSHOTS_DATA_DIR", {
+    group: "Puppeteer",
+    describe: "Location of screenshots data directory",
+    type: "string",
+    hidden: true,
+    default: defaults.puppeteer.SCREENSHOTS_DATA_DIR
+  })
+  // Parser Options
+  .option("VERBOSE_PARSING", {
+    alias: "v",
+    group: "Parser",
+    describe: "Enable verbose logging for Parsing",
+    type: "boolean",
+    default: defaults.parser.VERBOSE_PARSING
+  })
+  // Markdown Options
+  .option("FILTER_NEW_SEASON", {
+    alias: "n",
+    group: "Markdown",
+    describe: "Include new seasons in output",
+    type: "boolean",
+    default: defaults.markdown.FILTER_NEW_SEASON
+  })
+  .option("FILTER_ONGOING_SEASON", {
+    alias: "o",
+    group: "Markdown",
+    describe: "Include ongoing seasons in output",
+    type: "boolean",
+    default: defaults.markdown.FILTER_ONGOING_SEASON
+  })
+  .option("FILTER_NEW_SERIES", {
+    alias: "N",
+    group: "Markdown",
+    describe: "Include new series in output",
+    type: "boolean",
+    default: defaults.markdown.FILTER_NEW_SERIES
+  })
+  // Output Options
+  .option("WRITE_TO_FILE", {
+    alias: "w",
+    group: "Output",
+    describe: "Write to file",
+    type: "boolean",
+    default: defaults.output.WRITE_TO_FILE
+  })
+  .option("WRITE_TO_CONSOLE", {
+    alias: "c",
+    group: "Output",
+    describe: "Write to console",
+    type: "boolean",
+    default: defaults.output.WRITE_TO_CONSOLE
+  })
+  .check(args => {
+    // When PRINT_CONFIG is set we want to ignore the errors
+    if (args.PRINT_CONFIG) return true;
+
+    // Must filter for something
+    if (
+      !args.FILTER_NEW_SEASON &&
+      !args.FILTER_ONGOING_SEASON &&
+      !args.FILTER_NEW_SERIES
+    ) {
+      throw new Error(
+        "At least one of [FILTER_NEW_SEASON, FILTER_ONGOING_SEASON, FILTER_NEW_SERIES] must be true"
+      );
+    }
+
+    if (!args.WRITE_TO_FILE && !args.WRITE_TO_CONSOLE) {
+      throw new Error(
+        "At least one of [WRITE_TO_FILE, WRITE_TO_CONSOLE] must be true"
+      );
+    }
+
+    return true;
+  })
+  .fail((msg, err, yargs) => {
+    // if (err) throw err; // preserve stack
+    console.error("\nError:", msg, "\n");
+    console.error(yargs.help());
+    process.exit(1);
+  }).argv;
+
+const {
+  // Generic Options
+  PRINT_CONFIG,
+  // Puppeteer Options
+  TAKE_SCREENSHOT,
+  CHROME_EXECUTABLE_PATH,
+  CHROME_DATA_DIR,
+  SCREENSHOTS_DATA_DIR,
+  // Parser Options
+  VERBOSE_PARSING,
+  // Markdown Options
+  FILTER_NEW_SEASON,
+  FILTER_ONGOING_SEASON,
+  FILTER_NEW_SERIES,
+  // Output Options
+  WRITE_TO_FILE,
+  WRITE_TO_CONSOLE
+} = args;
+
+const mergedArgs = {
+  puppeteer: {
+    ...defaults.puppeteer,
+    TAKE_SCREENSHOT,
+    CHROME_EXECUTABLE_PATH,
+    CHROME_DATA_DIR,
+    SCREENSHOTS_DATA_DIR
+  },
+  parser: {
+    ...defaults.parser,
+    VERBOSE_PARSING
+  },
+  markdown: {
+    ...defaults.markdown,
+    FILTER_NEW_SEASON,
+    FILTER_ONGOING_SEASON,
+    FILTER_NEW_SERIES
+  },
+  output: {
+    ...defaults.output,
+    WRITE_TO_FILE,
+    WRITE_TO_CONSOLE
+  }
+};
+
+if (PRINT_CONFIG) {
+  console.log(JSON.stringify(mergedArgs, null, 4));
+  process.exit(1);
+}
+
+main(mergedArgs);
