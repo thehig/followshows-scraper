@@ -12,9 +12,10 @@ async function scrapeVideos({
     CSS_SELECTOR_VIDEO_WRAPPER,
     CSS_SELECTOR_VIDEO_TILE,
     CSS_SELECTOR_VIDEO_INFOBAR,
-    SCREENSHOTS_DATA_DIR,
+
     TAKE_SCREENSHOT
-  }
+  },
+  output: { SCREENSHOT_FULLPATH }
 }) {
   console.log(`[ ] Puppeteer`);
   console.log(`[ ]      Opening Browser`);
@@ -41,9 +42,8 @@ async function scrapeVideos({
   if (TAKE_SCREENSHOT) {
     console.log(`[ ]      Screenshotting ${CSS_SELECTOR_VIDEO_GRID}`);
     const videoGrid = await page.$(CSS_SELECTOR_VIDEO_GRID);
-    await videoGrid.screenshot({
-      path: path.join(SCREENSHOTS_DATA_DIR, "example.png")
-    });
+    await videoGrid.screenshot({ path: SCREENSHOT_FULLPATH });
+    console.log(`[ ]      Saved to ${SCREENSHOT_FULLPATH}`);
   }
 
   const videos = await page.$$(CSS_SELECTOR_VIDEO_WRAPPER);
