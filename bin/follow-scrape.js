@@ -51,7 +51,7 @@ const args = yargs
   .alias("v", "version")
   // Generic Options
   .option("help", {
-    alias: "h",
+    alias: ["h", "?"],
     describe: "Show this document",
     type: "boolean"
   })
