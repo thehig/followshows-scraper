@@ -7,7 +7,7 @@
     "start": "node src/index.js"
   },
   "bin": {
-    "follow-scrape": "./bin/follow-scrape"
+    "follow-scrape": "./bin/follow-scrape.js"
   },
   "author": "",
   "license": "ISC",
