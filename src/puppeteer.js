@@ -3,6 +3,7 @@ const path = require("path");
 
 // Open the browser, scrape the raw data into a JSON object
 async function scrapeVideos({
+  SHOW_PROGRESS,
   puppeteer: {
     CHROME_EXECUTABLE_PATH,
     CHROME_DATA_DIR,
@@ -17,8 +18,8 @@ async function scrapeVideos({
   },
   output: { SCREENSHOT_FULLPATH }
 }) {
-  console.log(`[ ] Puppeteer`);
-  console.log(`[ ]      Opening Browser`);
+  SHOW_PROGRESS && console.log(`[ ] Puppeteer`);
+  SHOW_PROGRESS && console.log(`[ ]      Opening Browser`);
   const browser = await puppeteer.launch({
     devtools: true,
     headless: true,
@@ -28,7 +29,7 @@ async function scrapeVideos({
 
   const page = await browser.newPage();
 
-  console.log(`[ ]      Navigating to ${WEB_URL}`);
+  SHOW_PROGRESS && console.log(`[ ]      Navigating to ${WEB_URL}`);
   await page.goto(WEB_URL, {
     waitUntil: "networkidle2",
     timeout: 0
@@ -36,21 +37,23 @@ async function scrapeVideos({
 
   await page.bringToFront();
 
-  console.log(`[ ]      Clicking ${CSS_SELECTOR_SHOW_ALL}`);
+  SHOW_PROGRESS && console.log(`[ ]      Clicking ${CSS_SELECTOR_SHOW_ALL}`);
   await page.click(CSS_SELECTOR_SHOW_ALL);
 
   if (TAKE_SCREENSHOT) {
-    console.log(`[ ]      Screenshotting ${CSS_SELECTOR_VIDEO_GRID}`);
+    SHOW_PROGRESS &&
+      console.log(`[ ]      Screenshotting ${CSS_SELECTOR_VIDEO_GRID}`);
     const videoGrid = await page.$(CSS_SELECTOR_VIDEO_GRID);
     await videoGrid.screenshot({ path: SCREENSHOT_FULLPATH });
-    console.log(`[ ]      Saved to ${SCREENSHOT_FULLPATH}`);
+    SHOW_PROGRESS && console.log(`[ ]      Saved to ${SCREENSHOT_FULLPATH}`);
   }
 
   const videos = await page.$$(CSS_SELECTOR_VIDEO_WRAPPER);
-  process.stdout.write(`[ ]      Scraping ${CSS_SELECTOR_VIDEO_WRAPPER} `);
+  SHOW_PROGRESS &&
+    process.stdout.write(`[ ]      Scraping ${CSS_SELECTOR_VIDEO_WRAPPER} `);
   const shows = await Promise.all(
     videos.map(async video => {
-      process.stdout.write(".");
+      SHOW_PROGRESS && process.stdout.write(".");
       const tile = await video.$(CSS_SELECTOR_VIDEO_TILE);
       const tileInnerText = await tile.getProperty("innerText");
       const tileText = await tileInnerText.jsonValue();
@@ -62,9 +65,9 @@ async function scrapeVideos({
       return [tileText, infoText];
     })
   );
-  process.stdout.write("\n");
+  SHOW_PROGRESS && process.stdout.write("\n");
 
-  console.log("[ ]      Closing Browser");
+  SHOW_PROGRESS && console.log("[ ]      Closing Browser");
   await browser.close();
 
   return shows;

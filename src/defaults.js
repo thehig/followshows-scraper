@@ -12,6 +12,7 @@ const SCREENSHOT_DATA_DIR = path.resolve(__dirname, "../screenshots");
 const SCREENSHOT_FILENAME = `followshows-${date}.png`;
 
 const options = {
+  SHOW_PROGRESS: false,
   puppeteer: {
     TAKE_SCREENSHOT: false,
 

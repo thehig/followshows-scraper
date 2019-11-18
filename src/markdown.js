@@ -30,6 +30,7 @@ const createMarkdownTable = (dataArray, name) => {
 const createMarkdown = (
   showInformation,
   {
+    SHOW_PROGRESS,
     markdown: {
       NEW_SEASON_REGEX,
       FILTER_NEW_SEASON,
@@ -38,48 +39,49 @@ const createMarkdown = (
     }
   }
 ) => {
-  console.log(`[ ] Markdown`);
+  SHOW_PROGRESS && console.log(`[ ] Markdown`);
   const tables = [];
 
   if (FILTER_NEW_SERIES) {
-    process.stdout.write(`[ ]      Filtering New Series `);
+    SHOW_PROGRESS && process.stdout.write(`[ ]      Filtering New Series `);
     let count = 0;
     // New Series have nextEpisode === s1e1
     const newSeries = showInformation.filter(show => {
-      const include = show.nextEpisode === "s1e1";
-      include && count++ && process.stdout.write('.');
-      return include;
-    }); // prettier-ignore
+    const include = show.nextEpisode === "s1e1";
+    SHOW_PROGRESS && include && count++ &&  process.stdout.write('.');
+    return include;
+  }); // prettier-ignore
     tables.push(createMarkdownTable(newSeries, "New Series"));
-    process.stdout.write(` (${count})\n`);
+    SHOW_PROGRESS && process.stdout.write(` (${count})\n`);
   }
 
   if (FILTER_NEW_SEASON) {
-    process.stdout.write(`[ ]      Filtering New Seasons `);
+    SHOW_PROGRESS && process.stdout.write(`[ ]      Filtering New Seasons `);
     let count = 0;
     // New Season have nextEpisode episode === 1
     const newSeason = showInformation.filter(show => {
       const include =
         show.nextEpisode != "s1e1" && NEW_SEASON_REGEX.test(show.nextEpisode);
-      include && count++ && process.stdout.write(".");
+      SHOW_PROGRESS && include && count++ && process.stdout.write(".");
       return include;
     });
     tables.push(createMarkdownTable(newSeason, "New Season"));
-    process.stdout.write(` (${count})\n`);
+    SHOW_PROGRESS && process.stdout.write(` (${count})\n`);
   }
 
   if (FILTER_ONGOING_SEASON) {
-    process.stdout.write(`[ ]      Filtering Ongoing Seasons `);
+    SHOW_PROGRESS &&
+      process.stdout.write(`[ ]      Filtering Ongoing Seasons `);
     let count = 0;
     // Ongoing Season have nextEpisode !== 1 && !== s1e1
     const ongoingSeason = showInformation.filter(show => {
       const include =
         show.nextEpisode != "s1e1" && !NEW_SEASON_REGEX.test(show.nextEpisode);
-      include && count++ && process.stdout.write(".");
+      SHOW_PROGRESS && include && count++ && process.stdout.write(".");
       return include;
     });
     tables.push(createMarkdownTable(ongoingSeason, "Ongoing Season"));
-    process.stdout.write(` (${count})\n`);
+    SHOW_PROGRESS && process.stdout.write(` (${count})\n`);
   }
 
   const markdownText = prettier.format(tables.join("\n\n"), {

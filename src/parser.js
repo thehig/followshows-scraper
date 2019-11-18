@@ -1,11 +1,15 @@
 // Turn the scraped data into parsed, usable information
-const parseVideoInformation = (videos, { parser: { VERBOSE_PARSING } }) => {
-  console.log(`[ ] Parser`);
-  process.stdout.write(`[ ]      Parsing ${videos.length} videos `);
-  const write = VERBOSE_PARSING ? process.stdout.write : (f => f); // prettier-ignore
+const parseVideoInformation = (
+  videos,
+  { SHOW_PROGRESS, parser: { VERBOSE_PARSING } }
+) => {
+  SHOW_PROGRESS && console.log(`[ ] Parser`);
+  SHOW_PROGRESS &&
+    process.stdout.write(`[ ]      Parsing ${videos.length} videos `);
+  const write = VERBOSE_PARSING ? SHOW_PROGRESS && process.stdout.write : (f => f); // prettier-ignore
 
   const result = videos.map(([tileText, infoText]) => {
-    if (!VERBOSE_PARSING) process.stdout.write(".");
+    if (!VERBOSE_PARSING) SHOW_PROGRESS && process.stdout.write(".");
 
     //     tileText => ["The Good Place", "Employee of the Bearimy (25 min)"]
     const [showName, episodeNameAndDuration] = tileText.split("\n");
@@ -64,7 +68,7 @@ const parseVideoInformation = (videos, { parser: { VERBOSE_PARSING } }) => {
     };
   });
 
-  process.stdout.write("\n");
+  SHOW_PROGRESS && process.stdout.write("\n");
 
   return result;
 };

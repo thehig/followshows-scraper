@@ -66,6 +66,12 @@ const args = yargs
     type: "boolean",
     default: false
   })
+  .option("SHOW_PROGRESS", {
+    alias: "l",
+    describe: "Show progress information",
+    type: "boolean",
+    default: false
+  })
   // Puppeteer Options
   .option("TAKE_SCREENSHOT", {
     alias: "s",
@@ -173,6 +179,7 @@ const args = yargs
 const {
   // Generic Options
   PRINT_CONFIG,
+  SHOW_PROGRESS,
   // Puppeteer Options
   TAKE_SCREENSHOT,
   CHROME_EXECUTABLE_PATH,
@@ -190,6 +197,7 @@ const {
 } = args;
 
 const mergedArgs = {
+  SHOW_PROGRESS,
   puppeteer: {
     ...defaults.puppeteer,
     TAKE_SCREENSHOT,
