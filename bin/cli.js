@@ -165,8 +165,8 @@ const args = yargs
   })
   .fail((msg, err, yargs) => {
     // if (err) throw err; // preserve stack
-    console.error("\nError:", msg, "\n");
     console.error(yargs.help());
+    console.error("\nError:", msg, "\n");
     process.exit(1);
   }).argv;
 
